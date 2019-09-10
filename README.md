@@ -1,3 +1,5 @@
+Actualización: 10/09/2019
+
 # CDC-UNNOBA
 Algoritmos implementados en Maxima
 
