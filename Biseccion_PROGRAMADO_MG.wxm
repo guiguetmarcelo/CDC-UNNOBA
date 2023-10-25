@@ -1,0 +1,144 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 22.04.0 ] */
+/* [wxMaxima: title   start ]
+	Método de la bisección
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+Función programada con pasos detallados.
+Versión: g.1.0 (Con variables y funciones globales)
+
+Desarrollada y probada en:
+wxMaxima 19.05.x  
+maxima 5.43
+NO SE GARANTIZA EL CORRECTO FUNCIONAMIENTO EN OTRAS VERSIONES, INCLUYENDO EL CÁLCULO Y LA VISUALIZACIÓN DE RESULTADOS.
+
+Autor: Marcelo Guiguet
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+reset();
+kill(all);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: section start ]
+	Implementación
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fp(x):= [f(a[x])*f(p(x)),f(b[x])*f(p(x))]; /* Para visualizar manualmente los resultados */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+p(x):= (a[x] + b[x])/2;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+er(x):= abs((p(x)-p(x-1))/(p(x)))*100;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+er1(x):= (b[1]-a[1])/2**x;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+biseccion(_f,a,b,e,[op]):=(
+    _maxIter:0,
+    _forceStep:0,
+    if length(op) >= 1 then (
+        if op[1] > 0 then (
+            _maxIter:op[1],
+            print("Pasos maximos configurados:",_maxIter)
+        )
+        else (
+            _maxIter:0,
+            print("Pasos maximos configurados: sin límite")
+        ),
+        if length(op) >= 2 then (
+            if op[2] > 0 then (
+                _forceStep:op[2],
+                print("Se itera hasta al menos el paso:",_forceStep,"(Se ignora una cantidad maxima de pasos inferior a este valor)")
+            )
+        )
+    ),
+    a[1]:float(a),
+    b[1]:float(b),
+    paso:1,
+    print("Función f(x): ",_f(x)),
+    disp(printf(false,"Intervalo [~f ; ~f]",a,b)),
+    print(printf(false,"Error buscado menor al ~,2f%",e)),
+    if _f(a[1])*_f(b[1]) < 0 then (
+        print("Se cumple que f(a) y f(b) sean de distinto signo"),
+        print("--------------------------------------"),
+        print("Paso: 1"),
+        print(""),
+        display(a[1], b[1], p_[1]=p(1)),
+        for i:1 step 1 while if i = 1 or i +1 <= _forceStep then true else (if _maxIter > 0 then i + 1<= _maxIter and er(i) > e else er(i) > e ) do (
+            paso: paso + 1,
+            print('f(a_[i])*'f(p_[i]),"=",_f(a[i])*_f(p(i))),
+            print('f(b_[i])*'f(p_[i]),"=",_f(b[i])*_f(p(i))),
+            if _f(a[i])*_f(p(i)) < 0 then (
+                a[i+1]:a[i],
+                b[i+1]:p(i),
+                if true then /* Condicional pensado para incluir variable de control de esta impresión */(
+                    print("...."),
+                    print("Valores para la siguiente iteración"),
+                    print(a_[i+1],"=",a_[i],"=",a[i]),
+                    print(b_[i+1],"=",p_[i],"=",p(i)),
+                    print("....")
+                )
+            )
+            elseif _f(a[i])._f(p(i)) > 0 then (
+                a[i+1]:p(i),
+                b[i+1]:b[i],
+                if true then  /* Condicional pensado para incluir variable de control de esta impresión */(
+                    print("...."),
+                    print("Valores para la siguiente iteración"),
+                    print(a_[i+1],"=",p_[i],"=",p(i)),
+                    print(b_[i+1],"=",b_[i],"=",b[i]),
+                    print("....")
+                )
+            )
+            else (
+                print("Se llegó a la raiz exacta"),
+                return(p(i))
+            ),
+            print("--------------------------------------"),
+            print("Paso:",paso),
+            print(""),
+            display(a[i+1], b[i+1], p_[i+1]=p(i+1), abs(ε_a[i+1])=er(i+1)),
+            display(abs(ε_[i+1])=er1(i+1))
+        ) /* FIN for */,
+        p(paso) /* Retorna el punto buscado */
+    ) 
+    else print("No se cumplen las condiciones del problema. f(a) y f(b) no tienen diferentes signos")
+)$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: section start ]
+	Ejemplo
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x):= x**3+4*x**2-10;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+biseccion(f,1,2,1,0,2);
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 22.04.0"$
